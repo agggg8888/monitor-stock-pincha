@@ -21,12 +21,12 @@ def get_stock():
     soup = BeautifulSoup(resp.text, "html.parser")
 
     products = []
-    for product in soup.select(".product, .type-product, article.product"):
-        name_el = product.select_one(".woocommerce-loop-product__title, h2, .product-title")
+    for product in soup.select(".product-item"):
+        name_el = product.select_one(".product-item-name")
         name = name_el.get_text(strip=True) if name_el else "Producto sin nombre"
 
         talles = []
-        for talle in product.select(".swatchly-term-item, .swatch-label, .variation-selector, option"):
+        for talle in product.select(".product-item-option, .js-item-list-option, option, li"):
             t = talle.get_text(strip=True)
             if t and t.upper() in ["XS","S","M","L","XL","XXL","XXXL","2XL","3XL","UNICO","U"]:
                 talles.append(t.upper())
