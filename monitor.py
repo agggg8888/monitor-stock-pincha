@@ -2,7 +2,7 @@ import requests
 import json
 import os
 
-PAGE_URL = "https://tiendapincha.com/la-utileria/2020/"
+PAGE_URL = "https://tiendapincha.com/la-utileria/"
 TG_TOKEN = os.environ["TG_TOKEN"]
 TG_CHAT  = os.environ["TG_CHAT"]
 STATE_FILE = "state.json"
