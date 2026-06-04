@@ -1,0 +1,40 @@
+name: Monitor Stock Pincha
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'  # cada 30 minutos
+  workflow_dispatch:  # permite ejecutarlo manualmente
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Instalar dependencias
+        run: pip install anthropic requests
+
+      - name: Ejecutar monitor
+        env:
+          TG_TOKEN: ${{ secrets.TG_TOKEN }}
+          TG_CHAT: ${{ secrets.TG_CHAT }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python monitor.py
+
+      - name: Guardar estado
+        uses: actions/upload-artifact@v4
+        with:
+          name: state
+          path: state.json
+          overwrite: true
+
+      - name: Restaurar estado anterior
+        uses: actions/download-artifact@v4
+        with:
+          name: state
+        continue-on-error: true
