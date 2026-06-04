@@ -56,8 +56,6 @@ def main():
 
     if previous is None:
         save_state(current)
-        nombres = "\n".join(f"• {p['name']}" for p in current) if current else "ninguno"
-        send_telegram(f"🤖 Monitor iniciado!\n{len(current)} producto(s) encontrado(s):\n{nombres}\n🔗 {PAGE_URL}")
         return
 
     prev_map = {p["name"]: p["talles"] for p in previous}
