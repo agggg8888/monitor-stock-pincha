@@ -1,7 +1,7 @@
 import requests
 import json
 import os
-import re
+import subprocess
 from bs4 import BeautifulSoup
 
 PAGE_URL = "https://tiendapincha.com/la-utileria/"
@@ -19,20 +19,16 @@ def get_stock():
     headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
     resp = requests.get(PAGE_URL, headers=headers, timeout=15)
     soup = BeautifulSoup(resp.text, "html.parser")
-
     products = []
     for product in soup.select(".product-item"):
         name_el = product.select_one(".product-item-name")
         name = name_el.get_text(strip=True) if name_el else "Producto sin nombre"
-
         talles = []
         for talle in product.select(".product-item-option, .js-item-list-option, option, li"):
             t = talle.get_text(strip=True)
             if t and t.upper() in ["XS","S","M","L","XL","XXL","XXXL","2XL","3XL","UNICO","U"]:
                 talles.append(t.upper())
-
         products.append({"name": name, "talles": list(set(talles))})
-
     return products
 
 def load_state():
@@ -44,6 +40,13 @@ def load_state():
 def save_state(products):
     with open(STATE_FILE, "w") as f:
         json.dump(products, f)
+    subprocess.run(["git", "config", "user.email", "bot@monitor.com"])
+    subprocess.run(["git", "config", "user.name", "Monitor Bot"])
+    subprocess.run(["git", "add", STATE_FILE])
+    result = subprocess.run(["git", "diff", "--cached", "--quiet"])
+    if result.returncode != 0:
+        subprocess.run(["git", "commit", "-m", "update state"])
+        subprocess.run(["git", "push"])
 
 def main():
     try:
@@ -56,6 +59,7 @@ def main():
 
     if previous is None:
         save_state(current)
+        send_telegram(f"🤖 Monitor iniciado! {len(current)} producto(s) encontrado(s).\n🔗 {PAGE_URL}")
         return
 
     prev_map = {p["name"]: p["talles"] for p in previous}
