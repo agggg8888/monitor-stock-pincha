@@ -85,8 +85,6 @@ def main():
             cambios = True
 
     save_state(current)
-    if not cambios:
-        print("Sin cambios.")
 
 if __name__ == "__main__":
     main()
